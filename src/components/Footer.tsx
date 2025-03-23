@@ -76,7 +76,7 @@ const Footer = () => {
                 <Instagram size={20} />
               </a>
               <a href="#" className="text-gray-500 hover:text-brand-blue transition-colors" aria-label="YouTube">
-                <YouTube size={20} />
+                <Youtube size={20} />
               </a>
             </div>
           </div>
