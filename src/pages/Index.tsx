@@ -51,7 +51,7 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <h2 className="text-2xl md:text-3xl font-bold mb-10 text-center">Shop by Category</h2>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <Link 
                 to="/category/clothing" 
                 className="relative rounded-lg overflow-hidden group shadow-sm hover:shadow-md transition-all"
@@ -85,44 +85,6 @@ const Index = () => {
                     <div className="p-4 text-white">
                       <h3 className="font-bold text-lg mb-1">Electronics</h3>
                       <p className="text-sm text-white/80">Smart devices</p>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-              
-              <Link 
-                to="/category/accessories" 
-                className="relative rounded-lg overflow-hidden group shadow-sm hover:shadow-md transition-all"
-              >
-                <div className="aspect-square bg-[#FEF3C7] flex items-center justify-center overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1633973239624-1b023bf26a1a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1480&q=80" 
-                    alt="Accessories" 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-                    <div className="p-4 text-white">
-                      <h3 className="font-bold text-lg mb-1">Accessories</h3>
-                      <p className="text-sm text-white/80">Complete your look</p>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-              
-              <Link 
-                to="/category/home" 
-                className="relative rounded-lg overflow-hidden group shadow-sm hover:shadow-md transition-all"
-              >
-                <div className="aspect-square bg-[#ECFDF5] flex items-center justify-center overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1480&q=80" 
-                    alt="Home" 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-                    <div className="p-4 text-white">
-                      <h3 className="font-bold text-lg mb-1">Home</h3>
-                      <p className="text-sm text-white/80">Decor & essentials</p>
                     </div>
                   </div>
                 </div>

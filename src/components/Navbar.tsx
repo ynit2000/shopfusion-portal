@@ -52,8 +52,6 @@ const Navbar = () => {
           <nav className="hidden md:flex items-center space-x-8">
             <Link to="/category/clothing" className="font-medium hover:text-brand-blue transition-apple duration-300">Clothing</Link>
             <Link to="/category/electronics" className="font-medium hover:text-brand-blue transition-apple duration-300">Electronics</Link>
-            <Link to="/category/accessories" className="font-medium hover:text-brand-blue transition-apple duration-300">Accessories</Link>
-            <Link to="/category/home" className="font-medium hover:text-brand-blue transition-apple duration-300">Home</Link>
           </nav>
 
           {/* Search Bar */}
@@ -161,20 +159,6 @@ const Navbar = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Electronics
-              </Link>
-              <Link 
-                to="/category/accessories" 
-                className="py-2 font-medium hover:text-brand-blue transition-apple"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Accessories
-              </Link>
-              <Link 
-                to="/category/home" 
-                className="py-2 font-medium hover:text-brand-blue transition-apple"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Home
               </Link>
             </nav>
             
