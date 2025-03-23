@@ -20,6 +20,15 @@ interface ProductCardProps {
   className?: string;
 }
 
+// Helper function to format price in INR
+const formatInr = (price: number) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(price * 83); // Converting to INR (approximation)
+};
+
 const ProductCard: React.FC<ProductCardProps> = ({
   id,
   title,
@@ -151,11 +160,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {/* Price */}
         <div className="mt-auto flex items-center">
           <span className="font-semibold text-brand-darkgray">
-            ${price.toFixed(2)}
+            {formatInr(price)}
           </span>
           {originalPrice && (
             <span className="ml-2 text-sm text-gray-500 line-through">
-              ${originalPrice.toFixed(2)}
+              {formatInr(originalPrice)}
             </span>
           )}
         </div>

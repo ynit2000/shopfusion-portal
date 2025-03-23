@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -18,6 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { getProductById, getProductsByCategory, Product } from '@/lib/data';
+import { formatInr } from '@/lib/utils';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,14 +28,12 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [activeTab, setActiveTab] = useState('description');
 
-  // Simulate loading
   useEffect(() => {
     setIsLoading(true);
     const foundProduct = getProductById(id || '');
     setProduct(foundProduct);
     
     if (foundProduct) {
-      // Get related products from the same category
       const related = getProductsByCategory(foundProduct.category)
         .filter(p => p.id !== foundProduct.id)
         .slice(0, 8);
@@ -90,10 +88,8 @@ const ProductDetail = () => {
     );
   }
 
-  // Image gallery
   const productImages = product.images || [product.image];
   
-  // Handle quantity changes
   const decrementQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
@@ -102,7 +98,6 @@ const ProductDetail = () => {
     if (quantity < product.stock) setQuantity(quantity + 1);
   };
 
-  // Add to cart handler
   const handleAddToCart = () => {
     toast({
       title: "Added to cart",
@@ -110,7 +105,6 @@ const ProductDetail = () => {
     });
   };
 
-  // Add to wishlist handler
   const handleAddToWishlist = () => {
     toast({
       title: "Added to wishlist",
@@ -124,7 +118,6 @@ const ProductDetail = () => {
       
       <main className="flex-grow pt-24 pb-16">
         <div className="container mx-auto px-4">
-          {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
             <Link to="/" className="hover:text-brand-blue transition-colors">Home</Link>
             <ChevronRight size={14} />
@@ -147,10 +140,8 @@ const ProductDetail = () => {
           </div>
           
           <div className="flex flex-col md:flex-row gap-8 mb-12">
-            {/* Product Images */}
             <div className="w-full md:w-1/2">
               <div className="sticky top-24 space-y-4">
-                {/* Main Image */}
                 <div className="aspect-square rounded-lg overflow-hidden bg-white border">
                   <img 
                     src={productImages[currentImageIndex]} 
@@ -159,7 +150,6 @@ const ProductDetail = () => {
                   />
                 </div>
                 
-                {/* Thumbnail Gallery */}
                 {productImages.length > 1 && (
                   <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
                     {productImages.map((image, index) => (
@@ -182,9 +172,7 @@ const ProductDetail = () => {
               </div>
             </div>
             
-            {/* Product Details */}
             <div className="w-full md:w-1/2">
-              {/* Badge and Title */}
               <div className="mb-4">
                 {product.isNew && (
                   <span className="inline-block px-2 py-1 text-xs font-medium bg-green-500 text-white rounded-full mb-2">
@@ -193,7 +181,6 @@ const ProductDetail = () => {
                 )}
                 <h1 className="text-2xl md:text-3xl font-bold mb-2">{product.title}</h1>
                 
-                {/* Reviews */}
                 <div className="flex items-center gap-2">
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
@@ -212,15 +199,14 @@ const ProductDetail = () => {
                 </div>
               </div>
               
-              {/* Price */}
               <div className="mb-6">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl md:text-3xl font-bold">
-                    ${product.price.toFixed(2)}
+                    {formatInr(product.price)}
                   </span>
                   {product.originalPrice && (
                     <span className="text-lg text-gray-500 line-through">
-                      ${product.originalPrice.toFixed(2)}
+                      {formatInr(product.originalPrice)}
                     </span>
                   )}
                   {product.discount && (
@@ -235,14 +221,12 @@ const ProductDetail = () => {
                 </div>
               </div>
               
-              {/* Short Description */}
               <div className="mb-6">
                 <p className="text-gray-600">
                   {product.description}
                 </p>
               </div>
               
-              {/* Quantity Selector */}
               <div className="mb-6">
                 <label className="block text-sm font-medium mb-2">Quantity</label>
                 <div className="flex items-center">
@@ -274,7 +258,6 @@ const ProductDetail = () => {
                 </div>
               </div>
               
-              {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 mb-8">
                 <Button 
                   size="lg" 
@@ -303,7 +286,6 @@ const ProductDetail = () => {
                 </Button>
               </div>
               
-              {/* Delivery Info */}
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <div className="flex items-start gap-3 mb-3">
                   <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
@@ -312,7 +294,7 @@ const ProductDetail = () => {
                   <div>
                     <h4 className="font-medium">Free Delivery</h4>
                     <p className="text-sm text-gray-600">
-                      On orders over $50. Otherwise $5.99.
+                      On orders over ₹4,000. Otherwise ₹500.
                     </p>
                   </div>
                 </div>
@@ -334,9 +316,7 @@ const ProductDetail = () => {
             </div>
           </div>
           
-          {/* Product Details Tabs */}
           <div className="mb-16">
-            {/* Tab Navigation */}
             <div className="flex border-b">
               <button 
                 className={`px-6 py-3 font-medium ${
@@ -370,7 +350,6 @@ const ProductDetail = () => {
               </button>
             </div>
             
-            {/* Tab Content */}
             <div className="py-6">
               {activeTab === 'description' && (
                 <div className="animate-fade-in">
@@ -495,7 +474,6 @@ const ProductDetail = () => {
             </div>
           </div>
           
-          {/* Related Products */}
           {relatedProducts.length > 0 && (
             <FeaturedSection
               title="Related Products"
@@ -513,3 +491,4 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
+

@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { getProductsByCategory } from '@/lib/data';
+import { formatInr } from '@/lib/utils';
 import { 
   Grid, 
   List, 
@@ -29,12 +29,10 @@ const CategoryPage = () => {
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   
-  // Get all possible subcategories
   const subcategories = Array.from(
     new Set(products.map(product => product.subcategory))
   ).filter(Boolean) as string[];
 
-  // Simulate loading
   useEffect(() => {
     setIsLoading(true);
     setProducts(getProductsByCategory(category || ''));
@@ -46,12 +44,10 @@ const CategoryPage = () => {
     return () => clearTimeout(timer);
   }, [category]);
 
-  // Handle price range change
   const handlePriceChange = (min: number, max: number) => {
     setPriceRange([min, max]);
   };
 
-  // Handle subcategory selection
   const toggleSubcategory = (subcategory: string) => {
     setSelectedSubcategories(prev => 
       prev.includes(subcategory)
@@ -60,16 +56,13 @@ const CategoryPage = () => {
     );
   };
 
-  // Apply filters
   const applyFilters = () => {
     let filteredProducts = getProductsByCategory(category || '');
     
-    // Filter by price
     filteredProducts = filteredProducts.filter(
       product => product.price >= priceRange[0] && product.price <= priceRange[1]
     );
     
-    // Filter by subcategory
     if (selectedSubcategories.length > 0) {
       filteredProducts = filteredProducts.filter(
         product => product.subcategory && selectedSubcategories.includes(product.subcategory)
@@ -79,7 +72,6 @@ const CategoryPage = () => {
     setProducts(filteredProducts);
   };
 
-  // Reset filters
   const resetFilters = () => {
     setPriceRange([0, 2000]);
     setSelectedSubcategories([]);
@@ -92,7 +84,6 @@ const CategoryPage = () => {
       
       <main className="flex-grow pt-24 pb-16">
         <div className="container mx-auto px-4">
-          {/* Category Header */}
           <div className="mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between">
               <div>
@@ -107,7 +98,6 @@ const CategoryPage = () => {
                 </p>
               </div>
               
-              {/* View Toggle and Sort */}
               <div className="flex items-center gap-4 mt-4 md:mt-0">
                 <div className="flex items-center gap-2 border rounded-md">
                   <button
@@ -147,7 +137,6 @@ const CategoryPage = () => {
           </div>
           
           <div className="flex flex-col md:flex-row gap-6">
-            {/* Filters Sidebar */}
             <aside className={`md:block md:w-64 flex-shrink-0 ${filtersOpen ? 'block' : 'hidden'}`}>
               <div className="bg-white border rounded-lg p-4 mb-4 sticky top-24">
                 <div className="flex items-center justify-between mb-4">
@@ -160,9 +149,8 @@ const CategoryPage = () => {
                   </button>
                 </div>
                 
-                {/* Price Range */}
                 <div className="mb-6">
-                  <h4 className="font-medium mb-3">Price Range</h4>
+                  <h4 className="font-medium mb-3">Price Range (₹)</h4>
                   <div className="flex items-center gap-2 mb-3">
                     <input 
                       type="number" 
@@ -182,7 +170,6 @@ const CategoryPage = () => {
                   </div>
                 </div>
                 
-                {/* Subcategories */}
                 {subcategories.length > 0 && (
                   <div className="mb-6">
                     <h4 className="font-medium mb-3">Subcategories</h4>
@@ -220,17 +207,14 @@ const CategoryPage = () => {
               </div>
             </aside>
             
-            {/* Products Grid */}
             <div className="flex-grow">
               {isLoading ? (
-                // Loading state
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                   {[...Array(8)].map((_, index) => (
                     <div key={index} className="bg-gray-100 rounded-lg animate-pulse h-[350px]"></div>
                   ))}
                 </div>
               ) : products.length > 0 ? (
-                // Products grid or list
                 isGridView ? (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                     {products.map((product) => (
@@ -256,10 +240,10 @@ const CategoryPage = () => {
                           </p>
                           <div className="flex items-center justify-between">
                             <div className="flex items-end gap-2">
-                              <span className="font-semibold text-xl">${product.price.toFixed(2)}</span>
+                              <span className="font-semibold text-xl">{formatInr(product.price)}</span>
                               {product.originalPrice && (
                                 <span className="text-sm text-gray-500 line-through">
-                                  ${product.originalPrice.toFixed(2)}
+                                  {formatInr(product.originalPrice)}
                                 </span>
                               )}
                             </div>
@@ -273,7 +257,6 @@ const CategoryPage = () => {
                   </div>
                 )
               ) : (
-                // No products found
                 <div className="text-center py-12">
                   <h3 className="text-xl font-semibold mb-2">No products found</h3>
                   <p className="text-gray-600 mb-6">
