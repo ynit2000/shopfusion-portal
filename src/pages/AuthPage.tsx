@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Navbar from '@/components/Navbar';
+import { useAuth } from '@/context/AuthContext';
 
 const formSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -23,6 +24,14 @@ const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -42,7 +51,10 @@ const AuthPage = () => {
           password: values.password,
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Login error:', error);
+          throw error;
+        }
         
         toast({
           title: "Logged in successfully",
@@ -56,19 +68,32 @@ const AuthPage = () => {
           password: values.password,
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Signup error:', error);
+          throw error;
+        }
         
-        toast({
-          title: "Account created",
-          description: "Please check your email to confirm your account.",
-        });
-        
-        setAuthMode('login');
+        if (data.user?.identities?.length === 0) {
+          toast({
+            title: "Account already exists",
+            description: "Please use the login option instead.",
+            variant: "destructive",
+          });
+          setAuthMode('login');
+        } else {
+          toast({
+            title: "Account created",
+            description: "Please check your email to confirm your account.",
+          });
+          
+          setAuthMode('login');
+        }
       }
     } catch (error: any) {
+      console.error('Authentication error:', error);
       toast({
         title: "Authentication error",
-        description: error.message,
+        description: error.message || "An error occurred during authentication",
         variant: "destructive",
       });
     } finally {
