@@ -23,6 +23,8 @@ type FormValues = z.infer<typeof formSchema>;
 const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [resendingEmail, setResendingEmail] = useState(false);
+  const [emailToConfirm, setEmailToConfirm] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -41,6 +43,36 @@ const AuthPage = () => {
     },
   });
 
+  const handleResendConfirmation = async () => {
+    if (!emailToConfirm) return;
+    
+    setResendingEmail(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: emailToConfirm,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Confirmation email sent",
+        description: "Please check your inbox and confirm your email address.",
+      });
+    } catch (error: any) {
+      console.error('Error resending confirmation:', error);
+      toast({
+        title: "Error sending confirmation",
+        description: error.message || "Could not send confirmation email",
+        variant: "destructive",
+      });
+    } finally {
+      setResendingEmail(false);
+    }
+  };
+
   const handleAuth = async (values: FormValues) => {
     setIsLoading(true);
 
@@ -53,6 +85,18 @@ const AuthPage = () => {
 
         if (error) {
           console.error('Login error:', error);
+          
+          // Handle "Email not confirmed" error specifically
+          if (error.message === "Email not confirmed" || error.code === "email_not_confirmed") {
+            setEmailToConfirm(values.email);
+            toast({
+              title: "Email not confirmed",
+              description: "Please check your inbox and confirm your email address, or request a new confirmation email.",
+              variant: "destructive",
+            });
+            return;
+          }
+          
           throw error;
         }
         
@@ -81,12 +125,11 @@ const AuthPage = () => {
           });
           setAuthMode('login');
         } else {
+          setEmailToConfirm(values.email);
           toast({
             title: "Account created",
             description: "Please check your email to confirm your account.",
           });
-          
-          setAuthMode('login');
         }
       }
     } catch (error: any) {
@@ -115,6 +158,23 @@ const AuthPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {emailToConfirm ? (
+              <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-md">
+                <h3 className="font-medium text-amber-800 mb-2">Email confirmation required</h3>
+                <p className="text-amber-700 text-sm mb-4">
+                  Please check your inbox at <span className="font-medium">{emailToConfirm}</span> and click the confirmation link.
+                </p>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={handleResendConfirmation}
+                  disabled={resendingEmail}
+                >
+                  {resendingEmail ? "Sending..." : "Resend confirmation email"}
+                </Button>
+              </div>
+            ) : null}
+            
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleAuth)} className="space-y-4">
                 <FormField
@@ -152,7 +212,10 @@ const AuthPage = () => {
           <CardFooter className="flex flex-col">
             <Button 
               variant="ghost" 
-              onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}
+              onClick={() => {
+                setAuthMode(authMode === 'login' ? 'signup' : 'login');
+                setEmailToConfirm(null);
+              }}
               className="w-full mt-2"
             >
               {authMode === 'login' 
