@@ -1,13 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, ShoppingCart, Menu, X, User, Heart } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, ShoppingCart, Menu, X, User, Heart, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,8 +32,24 @@ const Navbar = () => {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle search functionality
     console.log(`Searching for: ${searchQuery}`);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Logged out successfully",
+        description: "You have been signed out of your account.",
+      });
+      navigate('/');
+    } catch (error) {
+      toast({
+        title: "Error signing out",
+        description: "There was a problem signing out. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -85,14 +105,36 @@ const Navbar = () => {
               <Heart size={20} className="text-gray-700 hover:text-brand-blue transition-apple" />
             </Button>
             
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full hover:bg-gray-100 transition-apple"
-              aria-label="Account"
-            >
-              <User size={20} className="text-gray-700 hover:text-brand-blue transition-apple" />
-            </Button>
+            {user ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full hover:bg-gray-100 transition-apple"
+                  aria-label="Account"
+                >
+                  <User size={20} className="text-gray-700 hover:text-brand-blue transition-apple" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full hover:bg-gray-100 transition-apple"
+                  aria-label="Logout"
+                  onClick={handleSignOut}
+                >
+                  <LogOut size={20} className="text-gray-700 hover:text-brand-blue transition-apple" />
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth">
+                <Button
+                  variant="outline"
+                  className="rounded-full hover:bg-gray-100 transition-apple"
+                >
+                  Login
+                </Button>
+              </Link>
+            )}
             
             <Link to="/cart">
               <Button
@@ -160,6 +202,27 @@ const Navbar = () => {
               >
                 Electronics
               </Link>
+              
+              {user ? (
+                <button 
+                  className="py-2 font-medium hover:text-brand-blue transition-apple text-left flex items-center"
+                  onClick={() => {
+                    handleSignOut();
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <LogOut size={20} className="mr-2" />
+                  Logout
+                </button>
+              ) : (
+                <Link 
+                  to="/auth" 
+                  className="py-2 font-medium hover:text-brand-blue transition-apple"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Login / Sign Up
+                </Link>
+              )}
             </nav>
             
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
