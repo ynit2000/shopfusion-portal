@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,6 +26,10 @@ const AuthPage = () => {
   const [emailToConfirm, setEmailToConfirm] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Demo account credentials
+  const DEMO_EMAIL = '1032230875@tcetmumbai.in';
+  const DEMO_PASSWORD = 'nitesh123';
 
   // Redirect if already logged in
   useEffect(() => {
@@ -73,6 +76,64 @@ const AuthPage = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD,
+      });
+
+      if (error) {
+        if (error.message.includes('already exists')) {
+          const { data, error: loginError } = await supabase.auth.signInWithPassword({
+            email: DEMO_EMAIL,
+            password: DEMO_PASSWORD,
+          });
+
+          if (loginError) {
+            console.error('Demo login error:', loginError);
+            throw loginError;
+          }
+          
+          toast({
+            title: "Logged in with demo account",
+            description: `Welcome to the demo!`,
+          });
+          
+          navigate('/');
+          return;
+        }
+        
+        console.error('Demo account creation error:', error);
+        throw error;
+      }
+      
+      toast({
+        title: "Demo account created",
+        description: "You can now log in with the demo account.",
+      });
+      
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD,
+      });
+      
+      if (!loginError) {
+        navigate('/');
+      }
+    } catch (error: any) {
+      console.error('Demo authentication error:', error);
+      toast({
+        title: "Authentication error",
+        description: error.message || "An error occurred during authentication",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleAuth = async (values: FormValues) => {
     setIsLoading(true);
 
@@ -86,7 +147,6 @@ const AuthPage = () => {
         if (error) {
           console.error('Login error:', error);
           
-          // Handle "Email not confirmed" error specifically
           if (error.message === "Email not confirmed" || error.code === "email_not_confirmed") {
             setEmailToConfirm(values.email);
             toast({
@@ -208,6 +268,21 @@ const AuthPage = () => {
                 </Button>
               </form>
             </Form>
+            
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <Button 
+                variant="secondary" 
+                className="w-full" 
+                onClick={handleDemoLogin}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Processing...' : 'Use Demo Account'}
+              </Button>
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                Email: {DEMO_EMAIL}<br />
+                Password: {DEMO_PASSWORD}
+              </p>
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col">
             <Button 
